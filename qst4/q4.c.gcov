@@ -1,0 +1,75 @@
+        -:    0:Source:q4.c
+        -:    0:Graph:q4.gcno
+        -:    0:Data:q4.gcda
+        -:    0:Runs:1
+        -:    1:#include <stdio.h>
+        -:    2:#include <stdlib.h>
+        -:    3:#include <limits.h>
+        -:    4:
+        -:    5:#define V 9 // Number of vertices in the graph
+        -:    6:
+       40:    7:int minDistance(int dist[], int sptSet[]) {
+       40:    8:    int min = INT_MAX, min_index;
+      400:    9:    for (int v = 0; v < V; v++)
+      360:   10:        if (sptSet[v] == 0 && dist[v] <= min)
+       84:   11:            min = dist[v], min_index = v;
+       40:   12:    return min_index;
+        -:   13:}
+        -:   14:
+        5:   15:void printSolution(int dist[], int n) {
+        5:   16:    printf("Vertex \t\t Distance from Source\n");
+       50:   17:    for (int i = 0; i < V; i++)
+       45:   18:        printf("%d \t\t %d\n", i, dist[i]);
+        5:   19:}
+        -:   20:
+        5:   21:void dijkstra(int graph[V][V], int src) {
+        -:   22:    int dist[V];
+        -:   23:    int sptSet[V];
+       50:   24:    for (int i = 0; i < V; i++)
+       45:   25:        dist[i] = INT_MAX, sptSet[i] = 0;
+        -:   26:
+        5:   27:    dist[src] = 0;
+        -:   28:
+       45:   29:    for (int count = 0; count < V - 1; count++) {
+       40:   30:        int u = minDistance(dist, sptSet);
+       40:   31:        sptSet[u] = 1;
+        -:   32:
+      400:   33:        for (int v = 0; v < V; v++)
+      360:   34:            if (!sptSet[v] && graph[u][v] && dist[u] != INT_MAX && dist[u] + graph[u][v] < dist[v])
+       35:   35:                dist[v] = dist[u] + graph[u][v];
+        -:   36:    }
+        -:   37:
+        5:   38:    printSolution(dist, V);
+        5:   39:}
+        -:   40:
+       14:   41:int readGraph(int graph[V][V]) {
+        -:   42:    int value;
+       67:   43:    for (int i = 0; i < V; i++) {
+      556:   44:        for (int j = 0; j < V; j++) {
+      503:   45:            if (scanf("%d", &value) != 1) return 0; // Read error
+      495:   46:            if (value < 0) return -1; // Negative weight found
+      494:   47:            graph[i][j] = value;
+        -:   48:        }
+        -:   49:    }
+        5:   50:    return 1; // Successful read
+        -:   51:}
+        -:   52:
+       14:   53:int main() {
+        -:   54:    int graph[V][V];
+       13:   55:    while (1) {
+       14:   56:        printf("Enter the adjacency matrix for the graph (enter EOF to exit):\n");
+       14:   57:        int result = readGraph(graph);
+       14:   58:        if (feof(stdin)) break; // Exit loop if EOF is reached
+       13:   59:        if (result == -1) {
+        1:   60:            printf("Error: Negative weight detected.\n");
+       12:   61:        } else if (result == 0) {
+        7:   62:            printf("Error: Incorrect input format.\n");
+        -:   63:            // Clear the input buffer
+        -:   64:            int c;
+      301:   65:            while ((c = getchar()) != '\n' && c != EOF);
+        -:   66:        } else {
+        5:   67:            dijkstra(graph, 0);
+        -:   68:        }
+        -:   69:    }
+        1:   70:    return 0;
+        -:   71:}
